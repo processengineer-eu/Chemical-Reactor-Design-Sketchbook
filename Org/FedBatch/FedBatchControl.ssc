@@ -1,0 +1,63 @@
+component FedBatchControl
+  % FedBatchControl : 1.5
+  % Controlling In- and Outflow for a FedBatch Reactor
+  %
+  % (c) Klaus Schnitzlein - 29.06.2026
+  
+  inputs
+    V = {0,'l'}; % V
+  end
+
+  outputs
+    SInput = {0,'1'}; % y1
+    SOutput = {0,'1'}; % y2
+  end
+
+  parameters
+    Vmin = {0,'l'}; % Minimum Volume
+    Vmax = {1,'l'}; % Maximum Volume
+  end
+  
+  annotations
+    Icon = './FedBatchControl.svg';
+    UILayout = [...
+      UIGroup('Parameters',Vmin,Vmax)];
+    SInput : Side = left;
+    SOutput : Side = right;
+    V : Side = bottom;
+  end
+
+  variables
+    isInput = {1,'1'};
+  end
+  
+  modecharts(ExternalAccess = observe)
+    mc = modechart
+      modes
+        mode INPUT
+          equations
+            isInput == true;
+            SInput == 1;
+            SOutput == 0;
+          end
+        end
+        mode OUTPUT
+          equations
+            isInput == false;
+            SInput == 0;
+            SOutput == 1;
+          end
+        end
+      end
+      
+      transitions
+        INPUT -> OUTPUT: ge(V,Vmax);
+        OUTPUT -> INPUT: le(V,Vmin);
+      end
+      
+      initial
+        INPUT: true;
+      end
+    end
+  end
+end
